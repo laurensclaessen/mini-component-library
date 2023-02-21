@@ -6,35 +6,62 @@ import { COLORS } from "../../constants";
 import VisuallyHidden from "../VisuallyHidden";
 
 const ProgressBar = ({ value, size }) => {
-  // return <progress id="loadinglabel" max="100" value={value}></progress>;
-
-  // return (
-  //   <span role="progressbar" aria-valuenow={value}>
-  //     <svg width="100" height="10">
-  //       <rect height="10" width="100" stroke="black" fill="black" />
-  //       <rect height="10" width={value} fill="grey" />
-  //     </svg>
-  //   </span>
-  // );
+  const Component = (() => {
+    if (size === "small") return ProgressBarSmall;
+    if (size === "medium") return ProgressBarMedium;
+    if (size === "large") return ProgressBarLarge;
+    throw new Error(`ProgressBar shouldn't be used with a size of "${size}"`);
+  })();
 
   return (
-    <Wrapper role="progressbar" aria-valuenow={value}>
-      <InnerBar style={{ "--value": `${value}%` }}></InnerBar>
-    </Wrapper>
+    <Component
+      role="progressbar"
+      aria-valuenow={value}
+      style={{ "--value": `${value}%` }}
+    >
+      <InnerBarWrapper>
+        <InnerBar></InnerBar>
+      </InnerBarWrapper>
+    </Component>
   );
 };
 
-const Wrapper = styled.div`
-  height: 12px;
-  overflow: hidden;
+const ProgressBarBase = styled.div`
   background: ${COLORS.transparentGray15};
+  box-shadow: inset 0px 2px 4px ${COLORS.transparentGray35};
   border-radius: 4px;
+  overflow: hidden;
+`;
+
+const InnerBarWrapper = styled.div`
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
 `;
 
 const InnerBar = styled.div`
   height: 100%;
   width: var(--value);
   background: ${COLORS.primary};
+`;
+
+const ProgressBarSmall = styled(ProgressBarBase)`
+  height: 8px;
+`;
+
+const ProgressBarMedium = styled(ProgressBarBase)`
+  height: 12px;
+`;
+
+// took the wrapping approach -> as size is not about size only
+const ProgressBarLarge = styled(ProgressBarBase)`
+  height: 24px;
+  border-radius: 8px;
+  padding: 4px;
+
+  ${InnerBarWrapper} {
+    border-radius: 4px;
+  }
 `;
 
 export default ProgressBar;
